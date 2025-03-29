@@ -1,10 +1,7 @@
 package DAO;
 import Model.Account;
 import Util.ConnectionUtil;
-
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
 
 
@@ -19,22 +16,23 @@ public class AccountDAO {
 
         String sql = "INSERT INTO account (username, password) Values(?,?)";
 
-        try(PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            ResultSet resultSet = preparedStatement.getGeneratedKeys();){  
-
-            
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);){   //retrieves the auto-generated key
+    
             preparedStatement.setString(1, acc.getUsername());
             preparedStatement.setString(2, acc.getPassword());
             
             preparedStatement.executeUpdate();
             
-            if(resultSet.next()){
-                int accountID = resultSet.getInt(1);
-                
-                return new Account(accountID, acc.getUsername(), acc.getPassword());
-                
-            }
-        } //closing resources
+          try (ResultSet resultSet = preparedStatement.getGeneratedKeys();){ //automatically closing resources
+
+              if(resultSet.next()){
+              int accountID = resultSet.getInt(1);
+              
+              return new Account(accountID, acc.getUsername(), acc.getPassword());
+              
+              }
+          }
+       } 
         
     } catch (SQLException e) {
         e.printStackTrace();
@@ -44,21 +42,36 @@ public class AccountDAO {
     
   }
 
-  public Account getAccountbyID(int accountID){
+  public Account retrieveAccount(String userName){
+    Connection connection = null;
 
+    try{
+        connection = ConnectionUtil.getConnection();
 
-    return null;
+        String sql = "SELECT * FROM account WHERE username = ?";
 
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql);){  
+            
+            preparedStatement.setString(1, userName);   
+
+            try(ResultSet resultSet = preparedStatement.executeQuery();){
+              
+              if(resultSet.next()){
+                
+                return new Account(resultSet.getInt("account_id"),
+                resultSet.getString("username"), 
+                resultSet.getString("password"));
+                
+              }
+           }
+        } 
+        
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+     
+       return null;
   }
-
-
-  public List<Account> getAllAccounts(){
-
-
-    return null;
-
-  }
-
 
     
 }
