@@ -42,7 +42,7 @@ public class AccountDAO {
     
   }
 
-  public Account retrieveAccount(String userName){
+  public Account retrieveAccountByUsername(String userName){
     Connection connection = null;
 
     try{
@@ -53,6 +53,37 @@ public class AccountDAO {
         try(PreparedStatement preparedStatement = connection.prepareStatement(sql);){  
             
             preparedStatement.setString(1, userName);   
+
+            try(ResultSet resultSet = preparedStatement.executeQuery();){
+              
+              if(resultSet.next()){
+                
+                return new Account(resultSet.getInt("account_id"),
+                resultSet.getString("username"), 
+                resultSet.getString("password"));
+                
+              }
+           }
+        } 
+        
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+     
+       return null;
+  }
+
+  public Account retrieveAccountByID(int accountID){
+    Connection connection = null;
+
+    try{
+        connection = ConnectionUtil.getConnection();
+
+        String sql = "SELECT * FROM account WHERE account_id = ?";
+
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql);){  
+            
+            preparedStatement.setInt(1, accountID);   
 
             try(ResultSet resultSet = preparedStatement.executeQuery();){
               

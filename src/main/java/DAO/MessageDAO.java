@@ -71,7 +71,7 @@ public class MessageDAO {
         }
         return messages;
 }
-    public Message getMessageByID(Message message){
+    public Message getMessageByID(int messageID){
 
         Connection connection = null;
       
@@ -82,13 +82,13 @@ public class MessageDAO {
 
             try(PreparedStatement preparedStatement = connection.prepareStatement(sql)){
 
-                  preparedStatement.setInt(1, message.getMessage_id());
+                  preparedStatement.setInt(1, messageID);
 
                try(ResultSet resultSet = preparedStatement.executeQuery();){
 
                 if(resultSet.next()){ //if since we are only expecting one row
             
-                    return new Message(resultSet.getInt("message_id"), resultSet.getInt("posted_by"),
+                    return new Message(messageID, resultSet.getInt("posted_by"),
                     resultSet.getString("message_text"), resultSet.getLong("time_posted_epoch"));
         
                 }
@@ -106,29 +106,28 @@ public class MessageDAO {
     
 
 
-public Message deleteMessageByID(Message message){
+public Message deleteMessageByID(int messageID){
 
     Connection connection = null;
   
     try{
         connection = ConnectionUtil.getConnection();
 
-        String sql = "DELETE * FROM message WHERE message_id = ?";
-
+        Message messageToDelete = getMessageByID(messageID);
+        
+        String sql = "DELETE FROM message WHERE message_id = ?";
+        
         try(PreparedStatement preparedStatement = connection.prepareStatement(sql)){
 
-              preparedStatement.setInt(1, message.getMessage_id());
+              preparedStatement.setInt(1, messageID);
 
-           try(ResultSet resultSet = preparedStatement.executeQuery();){
+           int deleted = preparedStatement.executeUpdate();
 
-            if(resultSet.next()){ 
-        
-                return new Message(resultSet.getInt("message_id"), resultSet.getInt("posted_by"),
-                resultSet.getString("message_text"), resultSet.getLong("time_posted_epoch"));
-    
-            }
+           if (deleted > 0 && messageToDelete != null){
+                    return messageToDelete;
 
-          }
+           }
+          
        }
     } 
     catch (SQLException e){
@@ -139,7 +138,7 @@ public Message deleteMessageByID(Message message){
 
 }
 
-public Message updateMessageByID(Message message){
+public Message updateMessageByID(int messageID, String newMessageText){
 
     Connection connection = null;
   
@@ -150,19 +149,18 @@ public Message updateMessageByID(Message message){
 
         try(PreparedStatement preparedStatement = connection.prepareStatement(sql)){
 
-              preparedStatement.setString(1, message.getMessage_text());
-              preparedStatement.setInt(2, message.getMessage_id());
+            preparedStatement.setString(1, newMessageText);
+            preparedStatement.setInt(2, messageID);
 
-           try(ResultSet resultSet = preparedStatement.executeQuery();){
+            int updated = preparedStatement.executeUpdate();
 
-            if(resultSet.next()){ 
-        
-                return new Message(resultSet.getInt("message_id"), resultSet.getInt("posted_by"),
-                resultSet.getString("message_text"), resultSet.getLong("time_posted_epoch"));
-    
+            Message updatedMessage = getMessageByID(messageID);
+
+            if (updated > 0 && updatedMessage != null){
+                     return updatedMessage;
+ 
             }
 
-          }
        }
     } 
     catch (SQLException e){
@@ -173,7 +171,7 @@ public Message updateMessageByID(Message message){
 
 }
 
-public List<Message> getAllMessagesFromUser(Account account){
+public List<Message> getAllMessagesFromUser(int accountID){
 
     Connection connection = null;
     List<Message> messages = new ArrayList<>();
@@ -184,7 +182,7 @@ public List<Message> getAllMessagesFromUser(Account account){
 
         try(PreparedStatement preparedStatement = connection.prepareStatement(sql)){
             
-            preparedStatement.setInt(1, account.getAccount_id());
+            preparedStatement.setInt(1, accountID);
           
             try(ResultSet resultSet = preparedStatement.executeQuery();){
 
@@ -202,8 +200,8 @@ public List<Message> getAllMessagesFromUser(Account account){
 
     }
     return messages;
-
 }
+
 }
 
 
