@@ -1,7 +1,6 @@
 package DAO;
 import Util.ConnectionUtil;
 import Model.Message;
-import Model.Account;
 import java.util.ArrayList;
 import java.util.List;
 import java.sql.*;
