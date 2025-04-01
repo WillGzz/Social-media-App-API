@@ -31,5 +31,6 @@ The project follows a **three-layer architecture**, consisting of:
 - H2
 - JDBC
 
-**Testing & Development:**  
+**Testing & Project Management:**  
 - JUnit
+- Maven
