@@ -14,7 +14,7 @@ This project serves as the backend API for a social media application. The appli
 The project follows a **three-layer architecture**, consisting of:
 
 - **Controller Layer**: Handles HTTP requests and routes them to appropriate service methods.
-- **Service Layer**: Contains the business logic for processing data and interacting with the DAO layer.
+- **Service Layer**: Contains the core logic for processing data and interacting with the DAO layer.
 - **Data Access Object Layer**: Manages data persistence, interacting with the database to fetch or modify data.
 
 ## Technologies Used
